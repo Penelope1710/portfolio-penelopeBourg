@@ -1,6 +1,6 @@
-import '../src/js/nav.js'
-import '../src/normalize.css'
-import '../src/style.css'
+import './js/nav.js'
+import './normalize.css'
+import './style.css'
 
 const apiUrl = import.meta.env.VITE_API_URL;
 
