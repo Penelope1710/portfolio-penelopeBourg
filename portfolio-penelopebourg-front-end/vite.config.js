@@ -8,8 +8,7 @@ export default defineConfig({
       input: {
         main: resolve(__dirname, 'index.html'),
         legal: resolve(__dirname, 'legal-informations.html'),
-        profile: resolve(__dirname, 'profile.html'),
-        error: resolve(__dirname, '404.html')
+        profile: resolve(__dirname, 'profile.html')
       }
     }
   },
