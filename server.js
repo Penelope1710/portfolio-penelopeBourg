@@ -7,8 +7,10 @@ dotenv.config({
     path: process.env.NODE_ENV === 'production' ? '.env.production' : '.env'
 });
 
+const RECAPTCHA_SECRET = process.env.RECAPTCHA_SECRET_KEY;
+
 const transporter = nodemailer.createTransport({
-    host: 'smtp.orange.fr',
+    host: 'smtp-relay.brevo.com',
     port: 465,
     secure: true,
     auth: {
@@ -18,6 +20,35 @@ const transporter = nodemailer.createTransport({
     connectionTimeout: 10000
 });
 
+async function verifyRecaptcha(token) {
+    const verifyURL = 'https://www.google.com/recaptcha/api/siteverify';
+
+    const params = new URLSearchParams();
+    params.append('secret', RECAPTCHA_SECRET);
+    params.append('response', token);
+
+    try {
+        const recaptchaRes = await fetch(verifyURL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: params.toString()
+        });
+
+        if (!recaptchaRes.ok) {
+            throw new Error(`Erreur réseau: ${recaptchaRes.status}`);
+        }
+
+        const result = await recaptchaRes.json();
+        console.log('Résultat complet de Google :', result);
+        return result;
+
+    } catch (err) {
+        console.error('Erreur lors de la vérification reCAPTCHA:', err);
+        throw err;
+    }
+}
 
 const server = createServer((req, res) => {
 
@@ -42,11 +73,21 @@ const server = createServer((req, res) => {
 
         req.on('end', async () => {
             try {
-                const { nom, email, message } = JSON.parse(body);
-                if (!nom || !email || !message) {
+                const { nom, email, message, recaptchaToken } = JSON.parse(body);
+                if (!nom || !email || !message || !recaptchaToken) {
                     res.writeHead(400, { 'Content-Type': 'application/json' });
                     return res.end(JSON.stringify({ message: 'Tous les champs sont requis.' }));
                 }
+
+const recaptchaResult = await verifyRecaptcha(recaptchaToken);
+
+console.log('Résultat complet reCAPTCHA:', recaptchaResult);
+
+if (!recaptchaResult.success || recaptchaResult.score < 0.5) {
+    console.warn('Échec reCAPTCHA :', recaptchaResult);
+    res.writeHead(403, { 'Content-Type': 'application/json' });
+    return res.end(JSON.stringify({ message: 'Échec vérification reCAPTCHA.' }));
+}
 
 
     const info = await transporter.sendMail({

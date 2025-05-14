@@ -142,58 +142,62 @@ const resultContainer = document.getElementById('result');
     e.preventDefault();
 
        if (inputsValidity.name && inputsValidity.email && inputsValidity.message) {
-        
-                const formData = {
-                    nom: nameInput.value.trim(),
-                    email: emailInput.value.trim(),
-                    message: messageInput.value.trim(),
-                };
+            grecaptcha.ready(function () {
+                grecaptcha.execute('6Lf-_SoqAAAAAGWBuWg_jyaFNfUC9eFT14Zp59UC', { action: 'submit' }).then(function (token) {
+                    const formData = {
+                        nom: nameInput.value.trim(),
+                        email: emailInput.value.trim(),
+                        message: messageInput.value.trim(),
+                        recaptchaToken: token
+                    };
 
-        submitButton.disabled = true;
-        submitButton.textContent = "Envoi...";
-        submitButton.classList.add("disabled");
-
-        
-
-        function resetSubmitButton() {
             submitButton.disabled = true;
-            submitButton.textContent = "ENVOYER";
-            submitButton.classList.remove("disabled");
-        }
+            submitButton.textContent = "Envoi...";
+            submitButton.classList.add("disabled");
 
-       fetch(`${apiUrl}/contact`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formData)
-
-       })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error("Erreur réseau");
-            }
-            return response.json();
-        })
-    
-        .then(data => {
-            resultContainer.textContent = 'Message envoyé avec succès !';
-            resultContainer.className = 'success';
-            console.log("réponse du serveur:", data)
-            form.reset();
-            inputsValidity.name = false;
-            inputsValidity.email = false;
-            inputsValidity.message = false;
             
+
+            function resetSubmitButton() {
+                submitButton.disabled = true;
+                submitButton.textContent = "ENVOYER";
+                submitButton.classList.remove("disabled");
+            }
+
+        fetch(`${apiUrl}/contact`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+
         })
-        .catch(error => {
-            console.error('Erreur au moment de l\'envoi :', error);
-            resultContainer.textContent = 'Erreur lors de l\'envoie du message. Merci de bien vouloir réessayer.';
-            resultContainer.className = 'error';
-        })
-        .finally(() => {
-            resetSubmitButton();
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Erreur réseau");
+                }
+                return response.json();
+            })
+        
+            .then(data => {
+                resultContainer.textContent = 'Message envoyé avec succès !';
+                resultContainer.className = 'success';
+                console.log("réponse du serveur:", data)
+                form.reset();
+                inputsValidity.name = false;
+                inputsValidity.email = false;
+                inputsValidity.message = false;
+                
+            })
+            .catch(error => {
+                console.error('Erreur au moment de l\'envoi :', error);
+                resultContainer.textContent = 'Erreur lors de l\'envoie du message. Merci de bien vouloir réessayer.';
+                resultContainer.className = 'error';
+            })
+            .finally(() => {
+                resetSubmitButton();
+            });
         });
-    }
+    });
+}
 });  
 }

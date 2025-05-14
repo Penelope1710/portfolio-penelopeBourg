@@ -15,7 +15,8 @@ export default defineConfig({
   server: {
     proxy: {
       '/contact': 'http://localhost:3000'
-    }
+    },
+    // host: "penelopebourg.fr"
   }
 });
 
