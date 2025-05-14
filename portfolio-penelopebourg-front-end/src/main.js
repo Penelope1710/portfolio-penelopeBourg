@@ -143,7 +143,7 @@ const resultContainer = document.getElementById('result');
 
        if (inputsValidity.name && inputsValidity.email && inputsValidity.message) {
             grecaptcha.ready(function () {
-                grecaptcha.execute('6Lf-_SoqAAAAAGWBuWg_jyaFNfUC9eFT14Zp59UC', { action: 'submit' }).then(function (token) {
+                grecaptcha.execute('6LdDuDkrAAAAAE-Kd567wFLfK0kaTVSx21hlSQt4', { action: 'submit' }).then(function (token) {
                     const formData = {
                         nom: nameInput.value.trim(),
                         email: emailInput.value.trim(),
