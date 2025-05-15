@@ -1,5 +1,5 @@
-import { defineConfig } from 'vite';
-import { resolve } from 'path';
+import { defineConfig } from 'vite'
+import { resolve } from 'path'
 
 export default defineConfig({
   root: './', // point de départ
@@ -10,7 +10,8 @@ export default defineConfig({
         legal: resolve(__dirname, 'legal-informations.html'),
         profile: resolve(__dirname, 'profile.html')
       }
-    }
+    },
+    outDir: 'public'
   },
   server: {
     proxy: {
